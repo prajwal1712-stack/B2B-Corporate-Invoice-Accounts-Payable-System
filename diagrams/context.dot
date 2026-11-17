@@ -1,0 +1,27 @@
+digraph G {
+  graph [rankdir=LR, splines=true, nodesep=0.7, ranksep=2.2, fontname="Helvetica", labelloc=t, fontsize=20,
+         label="Context Diagram (Level 0) - B2B Corporate Invoice & Accounts Payable System\n(Gane-Sarson notation)", pad=0.4];
+  node  [fontname="Helvetica", fontsize=12];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+  P  [label="0\nB2B Invoice &\nAccounts Payable\nSystem", shape=circle, style=filled, fillcolor="#cfe3ff", width=2.2, fixedsize=true, fontsize=14];
+  V  [label="Vendor /\nSupplier", shape=box, style=filled, fillcolor="#fff2cc"];
+  PD [label="Purchasing\nDepartment", shape=box, style=filled, fillcolor="#fff2cc"];
+  WH [label="Warehouse /\nReceiving", shape=box, style=filled, fillcolor="#fff2cc"];
+  DM [label="Department\nManager", shape=box, style=filled, fillcolor="#fff2cc"];
+  FH [label="Finance Head\n(CFO)", shape=box, style=filled, fillcolor="#fff2cc"];
+  BK [label="Bank", shape=box, style=filled, fillcolor="#fff2cc"];
+  MG [label="Management /\nAuditor", shape=box, style=filled, fillcolor="#fff2cc"];
+
+  V  -> P  [label="Vendor registration,\nInvoice"];
+  P  -> V  [label="Payment advice,\nDispute / query notice"];
+  PD -> P  [label="Purchase order"];
+  P  -> PD [label="PO & invoice match status"];
+  WH -> P  [label="Goods receipt note (GRN)"];
+  P  -> DM [label="Invoice for approval"];
+  DM -> P  [label="Level-1 approval decision"];
+  P  -> FH [label="Payment run proposal"];
+  FH -> P  [label="Level-2 approval / release"];
+  P  -> BK [label="Payment instruction\n(NEFT / RTGS file)"];
+  BK -> P  [label="Payment confirmation (UTR)"];
+  P  -> MG [label="DPO, discount yield,\naging & audit reports"];
+}

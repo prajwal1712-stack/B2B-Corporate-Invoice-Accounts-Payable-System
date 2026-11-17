@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AP Control Room – B2B Invoice & Accounts Payable</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f5;--panel:#fff;--ink:#17262b;--mut:#5d6f75;--line:#d9e0de;--teal:#0e7466;--amber:#c27a0a;--red:#b4372b;--blue:#41627a;--chip:#e8efed;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1d;--panel:#16252a;--ink:#e6eeec;--mut:#93a8ad;--line:#2a3d43;--teal:#35b9a6;--amber:#e3a23a;--red:#ee7466;--blue:#7fa3bd;--chip:#20343a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1d;--panel:#16252a;--ink:#e6eeec;--mut:#93a8ad;--line:#2a3d43;--teal:#35b9a6;--amber:#e3a23a;--red:#ee7466;--blue:#7fa3bd;--chip:#20343a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:22px;margin:0;font-weight:600}h2{font-size:15px;margin:0 0 10px;font-weight:600}
+.sub{color:var(--mut);margin:2px 0 14px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:3px}
+select,button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-height:36px}
+button{cursor:pointer}select:focus-visible,button:focus-visible,tr[tabindex]:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.hero{display:grid;grid-template-columns:minmax(260px,1.1fr) 2fr;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+.dpo{padding:18px 20px;border-right:1px solid var(--line)}
+.big{font-size:56px;font-weight:600;line-height:1;letter-spacing:-1px}.big small{font-size:18px;color:var(--mut);font-weight:400;letter-spacing:0}
+.track{position:relative;height:8px;border-radius:4px;background:var(--chip);margin:16px 0 6px}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--teal)}
+.track b{position:absolute;top:-4px;width:2px;height:16px;background:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr)}
+.kpi{padding:14px 18px;border-bottom:1px solid var(--line);border-left:1px solid var(--line)}
+.kpi:nth-child(-n+3){}.kpi:nth-child(n+4){border-bottom:0}.kpi:nth-child(3n+1){border-left:0}
+.kpi span{display:block;color:var(--mut);font-size:12px}.kpi strong{font-size:22px;font-weight:600}.kpi em{display:block;font-style:normal;font-size:12px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.ch{position:relative;height:250px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:500;color:var(--mut);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}td.n,th.n{text-align:right}
+tr[data-v]{cursor:pointer}tr.sel td{background:var(--chip)}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;background:var(--chip)}
+.tag.red{color:var(--red)}.tag.amber{color:var(--amber)}.tag.teal{color:var(--teal)}
+.pos{color:var(--red)}.neg{color:var(--teal)}
+ul{margin:0;padding-left:18px}li{margin:0 0 8px;max-width:75ch}
+@media(max-width:820px){.hero{grid-template-columns:1fr}.dpo{border-right:0;border-bottom:1px solid var(--line)}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi:nth-child(3n+1){border-left:1px solid var(--line)}.kpi:nth-child(odd){border-left:0}.kpi:nth-child(n+4){border-bottom:1px solid var(--line)}.big{font-size:46px}}
+</style></head><body><main>
+<h1>Accounts payable control room</h1>
+<p class="sub">B2B Corporate Invoice & AP System · sample dataset in ₹ · position as at 14 Nov 2026</p>
+<div class="bar">
+<label>Invoice period<select id="per"><option value="q">Aug – Oct 2026 (report period)</option><option value="a">Jul – Nov 2026 (all data)</option><option value="s">Sep – Oct 2026</option><option value="o">Oct 2026</option></select></label>
+<label>Vendor<select id="ven"></select></label>
+<button id="rst">Reset filters</button></div>
+<section class="hero"><div class="dpo"><span style="color:var(--mut)">Days payable outstanding</span>
+<div class="big" id="dpo">–<small> days</small></div>
+<div class="track"><i id="dbar"></i><b id="dmark"></b></div>
+<div id="dcap" style="color:var(--mut);font-size:12px"></div></div>
+<div class="kpis" id="kpis"></div></section>
+<div class="grid">
+<div class="card"><h2>Outstanding by age past due</h2><div class="ch"><canvas id="c1"></canvas></div></div>
+<div class="card"><h2>Average days to pay vs agreed terms</h2><div class="ch"><canvas id="c2"></canvas></div></div>
+<div class="card"><h2>Invoiced vs cash paid by month</h2><div class="ch"><canvas id="c3"></canvas></div></div>
+<div class="card"><h2>Invoice status (selected period)</h2><div class="ch"><canvas id="c4"></canvas></div></div></div>
+<div class="card" style="margin-bottom:16px"><h2>What needs attention</h2><ul id="ins"></ul></div>
+<div class="card" style="margin-bottom:16px"><h2>Vendor scorecard <span style="color:var(--mut);font-weight:400;font-size:12px">· select a row to filter the page</span></h2><div class="scroll"><table id="vt"></table></div></div>
+<div class="card"><h2>Open invoice queue <span style="color:var(--mut);font-weight:400;font-size:12px">· most overdue first</span></h2><div class="scroll"><table id="qt"></table></div></div>
+</main>
+<script>
+const D={"v":[["V001","Apex Office Supplies Pvt Ltd","2/10 Net 30",30],["V002","BlueWave IT Solutions","1/10 Net 45",45],["V003","Cargo Link Logistics","Net 30",30],["V004","Delta Packaging Industries","2/10 Net 30",30],["V005","EverGreen Facility Services","Net 45",45],["V006","FlexiPrint Media","1.5/15 Net 45",45],["V007","GlobalTech Hardware Traders","2/10 Net 30",30],["V008","Horizon Cloud Hosting","Net 60",60],["V009","Indus Raw Materials Co","1/10 Net 45",45],["V010","Jupiter Consulting LLP","Net 30",30]],"i":[["V006-2600","V006","2026-07-06","2026-08-20","2026-07-21",323084.0,4846.26,"PAID","MATCHED"],["V007-2601","V007","2026-07-09","2026-08-08","2026-07-19",527814.0,10556.28,"PAID","MATCHED"],["V008-2602","V008","2026-07-09","2026-09-07","",187620.0,0.0,"PAID","MATCHED"],["V009-2604","V009","2026-07-14","2026-08-28","2026-07-24",783166.0,7831.66,"PAID","MATCHED"],["V001-2603","V001","2026-07-14","2026-08-13","2026-07-24",86258.0,1725.16,"PAID","MATCHED"],["V001-2605","V001","2026-07-21","2026-08-20","2026-07-31",102660.0,2053.2,"PAID","NO_PO"],["V010-2606","V010","2026-07-22","2026-08-21","",643808.0,0.0,"PAID","MATCHED"],["V003-2607","V003","2026-07-23","2026-08-22","",517312.0,0.0,"PAID","MATCHED"],["V005-2608","V005","2026-07-23","2026-09-06","",800512.0,0.0,"PAID","MATCHED"],["V010-2609","V010","2026-07-28","2026-08-27","",1059640.0,0.0,"DISPUTED","VARIANCE"],["V001-2610","V001","2026-07-30","2026-08-29","2026-08-09",834968.0,16699.36,"PAID","MATCHED"],["V007-2611","V007","2026-08-07","2026-09-06","2026-08-17",140892.0,2817.84,"APPROVED","MATCHED"],["V010-2612","V010","2026-08-07","2026-09-06","",1027308.0,0.0,"PAID","MATCHED"],["V004-2613","V004","2026-08-08","2026-09-07","2026-08-18",894086.0,17881.72,"PAID","MATCHED"],["V004-2614","V004","2026-08-14","2026-09-13","2026-08-24",1048430.0,20968.6,"REJECTED","MATCHED"],["V001-2615","V001","2026-08-18","2026-09-17","2026-08-28",52156.0,1043.12,"PAID","MATCHED"],["V007-2616","V007","2026-08-23","2026-09-22","2026-09-02",306328.0,6126.56,"PAID","MATCHED"],["V010-2617","V010","2026-08-28","2026-09-27","",483092.0,0.0,"PAID","MATCHED"],["V003-2618","V003","2026-09-03","2026-10-03","",61832.0,0.0,"APPROVED","MATCHED"],["V004-2619","V004","2026-09-04","2026-10-04","2026-09-14",986008.0,19720.16,"PAID","MATCHED"],["V006-2620","V006","2026-09-04","2026-10-19","2026-09-19",687586.0,10313.79,"PAID","MATCHED"],["V007-2621","V007","2026-09-05","2026-10-05","2026-09-15",762162.0,15243.24,"PAID","NO_PO"],["V009-2622","V009","2026-09-05","2026-10-20","2026-09-15",537608.0,5376.08,"PAID","MATCHED"],["V010-2623","V010","2026-09-11","2026-10-11","",667290.0,0.0,"PAID","MATCHED"],["V004-2624","V004","2026-09-12","2026-10-12","2026-09-22",177944.0,3558.88,"PAID","MATCHED"],["V002-2625","V002","2026-09-18","2026-11-02","2026-09-28",537844.0,5378.44,"APPROVED","MATCHED"],["V010-2627","V010","2026-09-22","2026-10-22","",105256.0,0.0,"DISPUTED","VARIANCE"],["V004-2626","V004","2026-09-22","2026-10-22","2026-10-02",1003118.0,20062.36,"PAID","MATCHED"],["V002-2628","V002","2026-09-28","2026-11-12","2026-10-08",60062.0,600.62,"PAID","MATCHED"],["V007-2629","V007","2026-09-28","2026-10-28","2026-10-08",786234.0,15724.68,"PARTIALLY_PAID","MATCHED"],["V004-2630","V004","2026-09-30","2026-10-30","2026-10-10",585398.0,11707.96,"PAID","MATCHED"],["V001-2631","V001","2026-10-02","2026-11-01","2026-10-12",412174.0,8243.48,"PAID","MATCHED"],["V007-2633","V007","2026-10-06","2026-11-05","2026-10-16",118590.0,2371.8,"PAID","NO_PO"],["V005-2632","V005","2026-10-06","2026-11-20","",353882.0,0.0,"APPROVED","MATCHED"],["V009-2635","V009","2026-10-09","2026-11-23","2026-10-19",1024948.0,10249.48,"PAID","MATCHED"],["V003-2634","V003","2026-10-09","2026-11-08","",689592.0,0.0,"PAID","MATCHED"],["V006-2636","V006","2026-10-11","2026-11-25","2026-10-26",912376.0,13685.64,"PAID","MATCHED"],["V009-2638","V009","2026-10-11","2026-11-25","2026-10-21",876150.0,8761.5,"PAID","MATCHED"],["V008-2637","V008","2026-10-11","2026-12-10","",612774.0,0.0,"APPROVED","MATCHED"],["V010-2640","V010","2026-10-12","2026-11-11","",73986.0,0.0,"DISPUTED","VARIANCE"],["V004-2639","V004","2026-10-12","2026-11-11","2026-10-22",694076.0,13881.52,"APPROVED","MATCHED"],["V010-2641","V010","2026-10-16","2026-11-15","",958396.0,0.0,"APPROVED","MATCHED"],["V005-2642","V005","2026-10-19","2026-12-03","",1007012.0,0.0,"APPROVED","MATCHED"],["V006-2643","V006","2026-10-19","2026-12-03","2026-11-03",408516.0,6127.74,"PAID","MATCHED"],["V002-2644","V002","2026-10-24","2026-12-08","2026-11-03",689474.0,6894.74,"APPROVED","MATCHED"],["V009-2645","V009","2026-10-28","2026-12-12","2026-11-07",375712.0,3757.12,"APPROVED","MATCHED"],["V009-2646","V009","2026-10-29","2026-12-13","2026-11-08",626108.0,6261.08,"APPROVED","MATCHED"],["V006-2647","V006","2026-10-30","2026-12-14","2026-11-14",823876.0,12358.14,"APPROVED","MATCHED"]],"p":[["V007-2601","2026-07-18",517257.72,10556.28],["V009-2604","2026-07-19",775334.34,7831.66],["V001-2605","2026-07-26",100606.8,2053.2],["V001-2603","2026-08-15",86258.0,0.0],["V006-2600","2026-08-20",323084.0,0.0],["V003-2607","2026-08-22",517312.0,0.0],["V001-2615","2026-08-24",51112.88,1043.12],["V010-2606","2026-08-26",643808.0,0.0],["V007-2616","2026-08-29",300201.44,6126.56],["V010-2612","2026-08-31",1027308.0,0.0],["V005-2608","2026-09-02",800512.0,0.0],["V001-2610","2026-09-03",834968.0,0.0],["V009-2622","2026-09-09",532231.92,5376.08],["V004-2613","2026-09-12",894086.0,0.0],["V004-2619","2026-09-13",966287.84,19720.16],["V008-2602","2026-09-19",187620.0,0.0],["V004-2624","2026-09-21",174385.12,3558.88],["V010-2617","2026-09-29",483092.0,0.0],["V004-2626","2026-10-01",983055.64,20062.36],["V004-2630","2026-10-05",573690.04,11707.96],["V007-2629","2026-10-06",393117.0,0.0],["V007-2621","2026-10-07",762162.0,0.0],["V010-2623","2026-10-09",667290.0,0.0],["V007-2633","2026-10-10",116218.2,2371.8],["V001-2631","2026-10-12",403930.52,8243.48],["V006-2636","2026-10-15",898690.36,13685.64],["V009-2635","2026-10-15",1014698.52,10249.48],["V009-2638","2026-10-18",867388.5,8761.5],["V006-2620","2026-10-21",687586.0,0.0],["V006-2643","2026-11-02",402388.26,6127.74],["V002-2628","2026-11-12",60062.0,0.0],["V003-2634","2026-11-13",689592.0,0.0]]};
+const ASOF='2026-11-14',P={q:['2026-08-01','2026-10-31'],a:['2026-07-01','2026-11-14'],s:['2026-09-01','2026-10-31'],o:['2026-10-01','2026-10-31']};
+const d=s=>new Date(s+'T00:00:00Z'),days=(a,b)=>Math.round((d(b)-d(a))/864e5),add=(s,n)=>new Date(d(s).getTime()+n*864e5).toISOString().slice(0,10);
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),M=n=>'₹'+Math.round(n).toLocaleString('en-US'),pc=n=>(n*100).toFixed(1)+'%';
+const V=D.v.map(([c,n,t,net])=>({c,n,t,net})),vm={};V.forEach(v=>vm[v.c]=v);
+const I=D.i.map(([no,vc,idt,due,dd,tot,av,st,ms])=>({no,vc,idt,due,dd,tot,av,st,ms,pay:[]})),bn={};I.forEach(x=>bn[x.no]=x);
+D.p.forEach(([no,dt,amt,dis])=>bn[no].pay.push({dt,amt,dis}));
+const setl=(x,a)=>sum(x.pay.filter(p=>p.dt<=a),p=>p.amt+p.dis),os=(x,a)=>x.tot-setl(x,a);
+const bal=(a,L)=>sum(L.filter(x=>x.idt<=a&&x.st!='REJECTED'),x=>os(x,a));
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $=id=>document.getElementById(id);let ch={};
+$('ven').innerHTML='<option value="all">All vendors</option>'+V.map(v=>`<option value="${v.c}">${v.c} · ${v.n}</option>`).join('');
+function draw(id,cfg){if(!window.Chart)return;ch[id]&&ch[id].destroy();Chart.defaults.color=css('--mut');Chart.defaults.borderColor=css('--line');Chart.defaults.font.family='"IBM Plex Sans",system-ui,sans-serif';ch[id]=new Chart($(id),Object.assign({options:{responsive:true,maintainAspectRatio:false}},cfg,{options:Object.assign({responsive:true,maintainAspectRatio:false},cfg.options)}))}
+function render(){
+const [f,t]=P[$('per').value],vf=$('ven').value,L=I.filter(x=>vf=='all'||x.vc==vf),n=days(f,t)+1;
+const inP=L.filter(x=>x.idt>=f&&x.idt<=t&&x.st!='REJECTED'),purch=sum(inP,x=>x.tot);
+const dpo=purch?((bal(add(f,-1),L)+bal(t,L))/2)/purch*n:0,terms=purch?sum(inP,x=>x.tot*vm[x.vc].net)/purch:0;
+const el=inP.filter(x=>x.av>0&&['APPROVED','PARTIALLY_PAID','PAID'].includes(x.st)),taken=x=>sum(x.pay,p=>p.dis);
+const offered=sum(el,x=>x.av),got=sum(el,taken),missed=sum(el.filter(x=>x.dd&&x.dd<ASOF),x=>x.av-taken(x)),espend=sum(el,x=>x.tot);
+const open=L.filter(x=>x.st!='REJECTED'&&os(x,ASOF)>0.5).map(x=>({x,o:os(x,ASOF),dpd:days(x.due,ASOF)}));
+const B=[0,0,0,0,0];open.forEach(r=>{B[r.dpd<=0?0:r.dpd<=30?1:r.dpd<=60?2:r.dpd<=90?3:4]+=r.o});
+const out=sum(open,r=>r.o),over=sum(open.filter(r=>r.dpd>0),r=>r.o),disp=L.filter(x=>x.st=='DISPUTED');
+$('dpo').innerHTML=dpo.toFixed(1)+'<small> days</small>';
+const mx=Math.max(dpo,terms,1)*1.15;$('dbar').style.width=dpo/mx*100+'%';$('dmark').style.left=terms/mx*100+'%';
+$('dcap').textContent=`Bar = actual DPO · tick = blended agreed terms (${terms.toFixed(0)} days). Average payables ÷ purchases of ${M(purch)} × ${n} days.`;
+const K=[['Discount capture rate',offered?pc(got/offered):'–',`${M(got)} of ${M(offered)} offered`],['Early discount yield',espend?(got/espend*100).toFixed(2)+'%':'–','of discount-eligible spend'],['Discounts missed',M(missed),'window closed unpaid'],['Total outstanding',M(out),open.length+' open invoices'],['Overdue',M(over),pc(out?over/out:0)+' of outstanding'],['Disputed',disp.length+' invoices',M(sum(disp,x=>x.tot))+' on hold']];
+$('kpis').innerHTML=K.map(k=>`<div class="kpi"><span>${k[0]}</span><strong>${k[1]}</strong><em>${k[2]}</em></div>`).join('');
+const cs=[css('--teal'),css('--blue'),css('--amber'),css('--red'),css('--red')];
+draw('c1',{type:'bar',data:{labels:['Not due','1–30','31–60','61–90','90+'],datasets:[{data:B,backgroundColor:cs}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>M(c.raw)}}},scales:{y:{ticks:{callback:v=>'₹'+v/1e6+'M'}}}}});
+const VS=V.map(v=>{const li=inP.filter(x=>x.vc==v.c),ps=li.flatMap(x=>x.pay.map(p=>({...p,x}))),w=sum(ps,p=>p.amt+p.dis),ad=w?sum(ps,p=>(p.amt+p.dis)*days(p.x.idt,p.dt))/w:null;
+return{v,bill:sum(li,x=>x.tot),cash:sum(li,x=>sum(x.pay,p=>p.amt)),disc:sum(li,taken),os:sum(I.filter(x=>x.vc==v.c&&x.st!='REJECTED'),x=>os(x,ASOF)),ad,gap:ad==null?null:ad-v.net,n:li.length}}).filter(r=>r.n);
+const pv=VS.filter(r=>r.ad!=null);
+draw('c2',{type:'bar',data:{labels:pv.map(r=>r.v.c),datasets:[{label:'Avg days to pay',data:pv.map(r=>+r.ad.toFixed(1)),backgroundColor:css('--teal')},{label:'Agreed net days',data:pv.map(r=>r.v.net),backgroundColor:css('--line')}]},options:{plugins:{tooltip:{callbacks:{title:i=>vm[i[0].label].n}}}}});
+const ms=['2026-07','2026-08','2026-09','2026-10','2026-11'];
+draw('c3',{type:'bar',data:{labels:['Jul','Aug','Sep','Oct','Nov'],datasets:[{label:'Invoiced',data:ms.map(m=>sum(L.filter(x=>x.idt.slice(0,7)==m&&x.st!='REJECTED'),x=>x.tot)),backgroundColor:css('--blue')},{label:'Cash paid',data:ms.map(m=>sum(L.flatMap(x=>x.pay).filter(p=>p.dt.slice(0,7)==m),p=>p.amt)),backgroundColor:css('--teal')}]},options:{plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+M(c.raw)}}},scales:{y:{ticks:{callback:v=>'₹'+v/1e6+'M'}}}}});
+const sts=['PAID','PARTIALLY_PAID','APPROVED','DISPUTED','REJECTED'],pl=L.filter(x=>x.idt>=f&&x.idt<=t);
+draw('c4',{type:'doughnut',data:{labels:sts.map(s=>s.replace('_',' ').toLowerCase()),datasets:[{data:sts.map(s=>pl.filter(x=>x.st==s).length),backgroundColor:[css('--teal'),css('--blue'),css('--amber'),css('--red'),css('--mut')],borderColor:css('--panel')}]},options:{plugins:{legend:{position:'right'}}}});
+const ins=[],ov={};open.filter(r=>r.dpd>0).forEach(r=>ov[r.x.vc]=(ov[r.x.vc]||0)+r.o);
+const top=Object.entries(ov).sort((a,b)=>b[1]-a[1])[0];if(top)ins.push(`<b>${vm[top[0]].n}</b> holds the largest overdue balance, ${M(top[1])}. ${disp.some(x=>x.vc==top[0])?'Part of it is a disputed invoice waiting for a goods-receipt or credit-note fix.':'Release approved invoices to stop it ageing.'}`);
+if(offered)ins.push(`Only ${pc(got/offered)} of offered discounts were captured; ${M(missed)} lapsed. A 2/10 Net 30 discount is worth about 37% a year, so pay those invoices inside 10 days.`);
+const late=VS.filter(r=>r.gap>0).sort((a,b)=>b.gap-a.gap)[0];if(late)ins.push(`<b>${late.v.n}</b> is paid ${late.gap.toFixed(1)} days after its ${late.v.net}-day terms: a supply-continuity risk.`);
+const early=VS.filter(r=>r.gap<-30&&r.v.t.includes('1/10')).sort((a,b)=>a.gap-b.gap)[0];if(early)ins.push(`<b>${early.v.n}</b> is paid ${Math.abs(early.gap).toFixed(0)} days early for a 1% discount (about 10.5% a year). Cash may earn more elsewhere; consider paying nearer day 45.`);
+$('ins').innerHTML=ins.length?ins.map(i=>`<li>${i}</li>`).join(''):'<li>Nothing flagged for this selection.</li>';
+$('vt').innerHTML='<tr><th>Vendor</th><th>Terms</th><th class="n">Billed</th><th class="n">Cash paid</th><th class="n">Discount taken</th><th class="n">Outstanding</th><th class="n">Days to pay</th><th class="n">vs terms</th></tr>'+VS.map(r=>`<tr data-v="${r.v.c}" tabindex="0" class="${vf==r.v.c?'sel':''}"><td>${r.v.c} · ${r.v.n}</td><td>${r.v.t}</td><td class="n">${M(r.bill)}</td><td class="n">${M(r.cash)}</td><td class="n">${M(r.disc)}</td><td class="n">${M(r.os)}</td><td class="n">${r.ad==null?'–':r.ad.toFixed(1)}</td><td class="n ${r.gap>0?'pos':'neg'}">${r.gap==null?'–':(r.gap>0?'+':'')+r.gap.toFixed(1)}</td></tr>`).join('');
+const Q=open.sort((a,b)=>b.dpd-a.dpd).slice(0,8);
+$('qt').innerHTML='<tr><th>Invoice</th><th>Vendor</th><th>Due</th><th class="n">Outstanding</th><th>Status</th><th>Age</th></tr>'+Q.map(r=>`<tr><td>${r.x.no}</td><td>${vm[r.x.vc].n}</td><td>${r.x.due}</td><td class="n">${M(r.o)}</td><td><span class="tag ${r.x.st=='DISPUTED'?'red':r.x.st=='APPROVED'?'amber':'teal'}">${r.x.st.replace('_',' ').toLowerCase()}</span></td><td>${r.dpd>0?r.dpd+' days overdue':'due in '+(-r.dpd)+' days'}</td></tr>`).join('')||'<tr><td>No open invoices.</td></tr>'}
+$('per').onchange=$('ven').onchange=render;$('rst').onclick=()=>{$('per').value='q';$('ven').value='all';render()};
+$('vt').onclick=$('vt').onkeydown=e=>{if(e.type=='keydown'&&e.key!='Enter')return;const r=e.target.closest('tr[data-v]');if(r){$('ven').value=$('ven').value==r.dataset.v?'all':r.dataset.v;render()}};
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',render);render();
+</script></body></html>

@@ -1,0 +1,37 @@
+digraph G {
+  graph [rankdir=LR, splines=true, nodesep=0.55, ranksep=1.5, fontname="Helvetica", labelloc=t, fontsize=20, label="Level-1 DFD (Part A) - Onboarding, Purchasing, Invoice Capture & Matching", pad=0.4];
+  node  [fontname="Helvetica", fontsize=12];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+  V [label="Vendor", shape=box, style=filled, fillcolor="#fff2cc"];
+  PD [label="Purchasing\nDept", shape=box, style=filled, fillcolor="#fff2cc"];
+  WH [label="Warehouse", shape=box, style=filled, fillcolor="#fff2cc"];
+  P1 [label="1.0\nVendor Master\nManagement", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  P2 [label="2.0\nPO & Goods Receipt\nManagement", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  P3 [label="3.0\nInvoice Capture &\nValidation", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  P4 [label="4.0\nThree-Way\nMatching", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  D1 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D1 &nbsp; Vendors</TD></TR></TABLE>>];
+  D2 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D2 &nbsp; Purchase_Orders</TD></TR></TABLE>>];
+  D3 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D3 &nbsp; Goods_Receipts</TD></TR></TABLE>>];
+  D4 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D4 &nbsp; Invoices</TD></TR></TABLE>>];
+  D7 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D7 &nbsp; Payment_Terms</TD></TR></TABLE>>];
+
+  V  -> P1 [label="registration details"];
+  P1 -> D1 [label="vendor record"];
+  P1 -> V  [label="onboarding status"];
+  D7 -> P1 [label="terms list"];
+  PD -> P2 [label="purchase order"];
+  WH -> P2 [label="GRN"];
+  P2 -> D2 [label="PO + items"];
+  P2 -> D3 [label="goods receipt"];
+  D1 -> P2 [label="vendor status"];
+  V  -> P3 [label="invoice"];
+  D1 -> P3 [label="vendor status"];
+  D7 -> P3 [label="discount & net days"];
+  P3 -> D4 [label="booked invoice\n(due date, discount deadline)"];
+  P3 -> V  [label="duplicate / blocked\nrejection"];
+  D4 -> P4 [label="invoice"];
+  D2 -> P4 [label="PO value"];
+  D3 -> P4 [label="received value"];
+  P4 -> D4 [label="match status"];
+  P4 -> PD [label="variance alert"];
+}

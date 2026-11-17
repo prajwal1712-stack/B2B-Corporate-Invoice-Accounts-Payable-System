@@ -1,0 +1,37 @@
+digraph G {
+  graph [rankdir=LR, splines=true, nodesep=0.55, ranksep=1.5, fontname="Helvetica", labelloc=t, fontsize=20, label="Level-1 DFD (Part B) - Approval, Payment & MIS / DSS Reporting", pad=0.4];
+  node  [fontname="Helvetica", fontsize=12];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+  V [label="Vendor", shape=box, style=filled, fillcolor="#fff2cc"];
+  DM [label="Dept\nManager", shape=box, style=filled, fillcolor="#fff2cc"];
+  FH [label="Finance\nHead", shape=box, style=filled, fillcolor="#fff2cc"];
+  BK [label="Bank", shape=box, style=filled, fillcolor="#fff2cc"];
+  MG [label="Management /\nAuditor", shape=box, style=filled, fillcolor="#fff2cc"];
+  P5 [label="5.0\nApproval\nWorkflow", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  P6 [label="6.0\nPayment Scheduling\n& Disbursement", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  P7 [label="7.0\nMIS / DSS Reporting\n& Analytics", shape="box", style="rounded,filled", fillcolor="#cfe3ff", width=2.1, height=1.0, fontsize=12];
+  D4 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D4 &nbsp; Invoices</TD></TR></TABLE>>];
+  D5 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D5 &nbsp; Payments</TD></TR></TABLE>>];
+  D6 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D6 &nbsp; Approvals &amp; Audit_Log</TD></TR></TABLE>>];
+  D1 [shape=plain, label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#e2f0d9"><TR><TD SIDES="TB" BORDER="1">D1 &nbsp; Vendors</TD></TR></TABLE>>];
+
+  D4 -> P5 [label="matched invoice"];
+  P5 -> DM [label="approval request"];
+  DM -> P5 [label="L1 decision"];
+  P5 -> FH [label="approval request"];
+  FH -> P5 [label="L2 decision"];
+  P5 -> D6 [label="approval trail"];
+  P5 -> D4 [label="status = APPROVED"];
+  D4 -> P6 [label="approved invoices,\ndiscount deadline"];
+  P6 -> BK [label="payment instruction"];
+  BK -> P6 [label="UTR confirmation"];
+  P6 -> D5 [label="payment record"];
+  P6 -> D4 [label="paid / discount amounts"];
+  P6 -> V  [label="payment advice"];
+  D4 -> P7 [label="invoice data"];
+  D5 -> P7 [label="payment data"];
+  D1 -> P7 [label="vendor data"];
+  D6 -> P7 [label="audit data"];
+  P7 -> MG [label="DPO, discount yield,\naging, scorecard"];
+  P7 -> FH [label="payment-run\nrecommendations"];
+}

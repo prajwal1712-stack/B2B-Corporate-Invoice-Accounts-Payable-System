@@ -1,0 +1,33 @@
+digraph ERD {
+  graph [rankdir=LR, splines=true, nodesep=0.5, ranksep=1.2, fontname="Helvetica", labelloc=t, fontsize=22,
+         label="Entity Relationship Diagram - ap_system (MySQL)", pad=0.4];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, color="#555555", arrowhead=crow, arrowtail=tee, dir=both];
+
+  departments [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>departments</B></TD></TR><TR><TD ALIGN="LEFT"><U>dept_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">dept_name</TD></TR><TR><TD ALIGN="LEFT">cost_centre</TD></TR></TABLE>>];
+  users [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>users</B></TD></TR><TR><TD ALIGN="LEFT"><U>user_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">full_name, email</TD></TR><TR><TD ALIGN="LEFT">role</TD></TR><TR><TD ALIGN="LEFT">dept_id FK</TD></TR></TABLE>>];
+  payment_terms [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>payment_terms</B></TD></TR><TR><TD ALIGN="LEFT"><U>term_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">term_code</TD></TR><TR><TD ALIGN="LEFT">discount_pct, discount_days</TD></TR><TR><TD ALIGN="LEFT">net_days</TD></TR></TABLE>>];
+  vendors [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#ffe599"><B>vendors</B></TD></TR><TR><TD ALIGN="LEFT"><U>vendor_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">vendor_code, vendor_name</TD></TR><TR><TD ALIGN="LEFT">tax_id (GSTIN)</TD></TR><TR><TD ALIGN="LEFT">bank_account, bank_ifsc</TD></TR><TR><TD ALIGN="LEFT">term_id FK</TD></TR><TR><TD ALIGN="LEFT">status</TD></TR></TABLE>>];
+  purchase_orders [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#ffe599"><B>purchase_orders</B></TD></TR><TR><TD ALIGN="LEFT"><U>po_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">po_number</TD></TR><TR><TD ALIGN="LEFT">vendor_id FK, dept_id FK</TD></TR><TR><TD ALIGN="LEFT">created_by FK</TD></TR><TR><TD ALIGN="LEFT">po_date, po_value, status</TD></TR></TABLE>>];
+  po_items [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>po_items</B></TD></TR><TR><TD ALIGN="LEFT"><U>po_item_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">po_id FK</TD></TR><TR><TD ALIGN="LEFT">description, quantity</TD></TR><TR><TD ALIGN="LEFT">unit_price, line_total</TD></TR></TABLE>>];
+  goods_receipts [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>goods_receipts</B></TD></TR><TR><TD ALIGN="LEFT"><U>grn_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">po_id FK, received_by FK</TD></TR><TR><TD ALIGN="LEFT">received_date, received_value</TD></TR></TABLE>>];
+  invoices [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#ffe599"><B>invoices</B></TD></TR><TR><TD ALIGN="LEFT"><U>invoice_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">invoice_number (UNIQUE with vendor)</TD></TR><TR><TD ALIGN="LEFT">vendor_id FK, po_id FK, term_id FK</TD></TR><TR><TD ALIGN="LEFT">invoice_date, due_date, discount_deadline</TD></TR><TR><TD ALIGN="LEFT">subtotal, tax_amount, total_amount</TD></TR><TR><TD ALIGN="LEFT">discount_available, discount_taken</TD></TR><TR><TD ALIGN="LEFT">paid_amount, match_status, status</TD></TR></TABLE>>];
+  invoice_approvals [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#cfe3ff"><B>invoice_approvals</B></TD></TR><TR><TD ALIGN="LEFT"><U>approval_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">invoice_id FK, approver_id FK</TD></TR><TR><TD ALIGN="LEFT">level_no, decision, remarks</TD></TR></TABLE>>];
+  payments [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#ffe599"><B>payments</B></TD></TR><TR><TD ALIGN="LEFT"><U>payment_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">invoice_id FK, paid_by FK</TD></TR><TR><TD ALIGN="LEFT">payment_date, amount_paid</TD></TR><TR><TD ALIGN="LEFT">discount_taken, method</TD></TR><TR><TD ALIGN="LEFT">reference_no (UNIQUE)</TD></TR></TABLE>>];
+  audit_log [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3"><TR><TD BGCOLOR="#e2f0d9"><B>audit_log</B></TD></TR><TR><TD ALIGN="LEFT"><U>log_id</U> PK</TD></TR><TR><TD ALIGN="LEFT">table_name, record_id</TD></TR><TR><TD ALIGN="LEFT">action, details, logged_at</TD></TR></TABLE>>];
+
+  departments -> users;
+  departments -> purchase_orders;
+  payment_terms -> vendors;
+  payment_terms -> invoices;
+  vendors -> purchase_orders;
+  vendors -> invoices;
+  users -> purchase_orders;
+  purchase_orders -> po_items;
+  purchase_orders -> goods_receipts;
+  purchase_orders -> invoices;
+  invoices -> invoice_approvals;
+  invoices -> payments;
+  users -> invoice_approvals;
+  users -> payments;
+}
